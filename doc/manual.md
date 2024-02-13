@@ -1,13 +1,6 @@
-
-The following sequences are present in KEY-SEQ:
-
--SEQ
-
-KeySeq is a sequencer that can record sequences from a keyboard ((MIDI->CV)
-and can also be controlled via this keyboard.
+# KEY-SEQ
 
 ## Features
-
 
 - 12 sequences with a maximum of 256 steps.
 - Capturing notes, tied notes and rests
@@ -58,20 +51,20 @@ Now a sequence can be entered using the connected keyboard.
 
 The functions are started via the module’s virtual keyboard. The following commands are available:
 
-Play - Copies the current record sequence to the play sequence.
-Prev - moves the input position of the current record sequence on step forward.
-Next - moves the input position of the current record sequence on step backward.
-Rest - adds a rest to the current record sequence.
-Tie  - adds a tied note to the current record sequence.
-Del  - deletes a note from the current record sequence.
-Clear - deletes all notes from the current record sequence.
-Ins   - switches the insert mode on and off: notes will be inserted or overwritten.
-Sel   - starts selecting an other record sequence. Every following key of the virtual keyboard stands for one of 12 sequences.
-		To select it, the key has to be pressed.
-Copy  - Copies the current record sequence into an other record sequence. 
-		The target sequence has to be selected with a key (same as *Sel*).		
-Trans - switches the transpose mode on and off: the note from the keyboard is not recorded in the sequence
-        and is used instead to transpose the play sequence.
+	- **Play** : copies the current record sequence to the play sequence.
+	- **Prev** : moves the input position of the current record sequence on step forward.
+	- **Next** : moves the input position of the current record sequence on step backward.
+	- **Rest** : adds a rest to the current record sequence.
+	- **Tie**  : adds a tied note to the current record sequence.
+	- **Del**  : deletes a note from the current record sequence.
+	- **Clear** : deletes all notes from the current record sequence.
+	- **Ins**   : switches the insert mode on and off: notes will be inserted or overwritten.
+	- **Sel**   : starts selecting an other record sequence. Every following key of the virtual keyboard stands for one of 12 sequences.
+			To select it, the key has to be pressed.
+	- **Copy**  : Copies the current record sequence into an other record sequence. 
+			The target sequence has to be selected with a key (same as *Sel*).		
+	- **Trans** : switches the transpose mode on and off: the note from the keyboard is not recorded in the sequence
+			and is used instead to transpose the play sequence.
 
 ## Steuerung über Keyboard
 
