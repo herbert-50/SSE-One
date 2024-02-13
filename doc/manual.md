@@ -1,75 +1,77 @@
 
-# KeySeq
+The following sequences are present in KEY-SEQ:
 
-KeySeq ist ein Sequenzer, der über (MIDI->CV) Keyboard Sequenzen erfassen kann 
-und aber auch über Keyboard gesteuert werden kann.
+-SEQ
+
+KeySeq is a sequencer that can record sequences from a keyboard ((MIDI->CV)
+and can also be controlled via this keyboard.
 
 ## Features
 
 
-- 12 Sequenzen mit maximal 256 Steps.
-- Erfassen von Noten, verbundenen Noten und Pausen
-- Transpose Funktion
+- 12 sequences with a maximum of 256 steps.
+- Capturing notes, tied notes and rests
+- Transpose function for sequences
 
-## Grundprinzip
+## Basic principle
 
+The following sequences are present in KEY-Record sequences
 
-Folgende Sequenzen sind in KEY-SEQ vorhanden:
+12 Record sequences
+ 1 Play sequences
+ 1 Transpose sequences
 
-12 Record-Sequenzen
- 1 Play-Sequenz
- 1 Transpose-Sequenz
+The *record sequences* are recorded from the keyboard. Pressung a key will add or alter a step of the sequence.
+The current *record sequence* can be copied into the *play sequence* using the **Play** function.
+This sequence will then be played.
 
-Die Record-Sequenzen werden über (MIDI->CV) Keyboard erfasst. 
-Über die Funktion Play kann die aktuelle Record-Sequenz in die Play-Sequenz kopiert werden.
-Diese wird dann abgespielt.
-
-Über die Funktion Sel kann eine andere der 12 Record-Sequenzen ausgewählt werden, verändert werden und dann
-mit Play wieder in die Play-Sequenz kopiert werden. Der letzen Sequenz (Nummer 11) kommt eine besondere
-Bedeutung zu. Sie wird nicht in die Play-Sequenz kopiert, sondern in die Trans-Sequenz. Die Trans-Sequenz bestimmt
-die Basisnote der Play-Sequenz zum Transponieren. Nach jedem Durchlauf der Play-Sequenz, wird die nächste Note
-Trans-Sequenz ausgewählt.
-
-Die Steuerung der Eingabe findet über 
-
-- das virtuelle Keyboard des Moduls 
-- oder das angeschlossene (MIDI->CV) Keyboard 
-- oder über ein zweites angeschlossenes angeschlossene (MIDI->CV) Keyboard
-
-statt.
-
-## Verwendung
+Using the **Sel** function, another of the 12 *record sequences* can be selected, changed with the keyboard and then
+can be copied into the *play sequence* with **Play**. The last sequence (number 11) is special
+meaning too. It is not copied into the *play sequence*, but into the *trans sequence*. The *trans sequence* determines
+the base note of the *play sequence* to transpose. After each pass through the *play sequence* the next note
+of *trans sequence* will be used.
 
 
-Die Eingänge Run, Clk, Rst sind mit einem Clock Modul zu verbinden, das den Takt
-liefert und über das der Sequenzer gestartet und zurückgesetzt werden kann. Das Starten und
-Zurücksetzen ist auch mit den entsprechenden Schaltern des Moduls möglich. 
-Die Eingänge Run und Rst sind somit optional.
+The following options are available for controlling the sequences:
 
-An den Ausgängen CV, Gate und Vel wird die Sequenz ausgegeben. Über den Regler Gate, kann
-die Länge des Gate-Signals eingestellt werden.
+- the module's virtual keyboard
+- or the connected (MIDI->CV) keyboard
+- or a second connected (MIDI->CV) keyboard
 
-Die Eingänge CV, Gate und Vel sind mit einem MIDI->CV Modul zu verbinden oder mir einem Modul, 
-das ähnliche Signale liefert. Sowohl der Eingang als auch der Ausgang Vel ist optional.
-Über das angeschlossene Keyboard kann eine Sequenz eingegeben werden.
+## Usage
 
-Die Steuerung der Eingabe findet über das virtuelle Keyboard des Moduls statt. Folgende Befehle stehen zur
-Verfügung:
+The *Run*, *Clk*, *Rst* inputs must be connected to a clock module that supplies the clock
+and via which the sequencer can be started and reset. Starting and resetting
+can also be started and reset using the corresponding switches on the module. 
+The Run and Rst inputs are therefore optional.
 
-Play - kopiert die aktuelle Record-Sequenz in die Play-Sequenz
-Prev - positioniert die Eingabe einen Schritt nach vorne
-Next - positioniert die Eingabe einen Schritt nach hinten
-Rest - erfasst eine Pause in der Sequenz
-Tie  - erfasst eine Note, die mit der vorherigen verbunden wird
-Del  - löscht die aktuelle Note
-Clear - löscht die Record-Sequenz
-Ins   - schaltet den Insert-Modus ein und aus: Noten werden eingefügt und nicht überschrieben.
-Sel   - Wählt eine andere Record-Sequenz aus. Jeder Taste des virtuellen Keyboard ist eine von 12 Sequenzen zugeordnet.
-		Zur Auswahl ist nach Sel die entsprechende Taste zu drücken.
-Copy  - Kopiert die aktuelle Record-Sequenz in eine andere Record-Sequenz. 
-		Die Zielsequenz ist danach auf dem virtuellen Keyboard auszuwählen (wie bei Sel).		
-Trans - schaltet den Transpose Modus ein und aus: die Note vom Keyboard wird nicht in der Sequenz erfasst 
-		und dient stattdessen zum Transponieren der Play-Sequenz.
+The sequence is output at the *CV*, *Gate* and *Vel* outputs. The *Gate* control can be used to
+the set the length of the gate signal .
+
+The *CV*, *Gate* and *Vel* inputs must be connected to a *MIDI->CV* module or to a module
+which provides similar signals. 
+
+Both input and output *Vel* are optional.
+
+Now a sequence can be entered using the connected keyboard.
+
+
+The functions are started via the module’s virtual keyboard. The following commands are available:
+
+Play - Copies the current record sequence to the play sequence.
+Prev - moves the input position of the current record sequence on step forward.
+Next - moves the input position of the current record sequence on step backward.
+Rest - adds a rest to the current record sequence.
+Tie  - adds a tied note to the current record sequence.
+Del  - deletes a note from the current record sequence.
+Clear - deletes all notes from the current record sequence.
+Ins   - switches the insert mode on and off: notes will be inserted or overwritten.
+Sel   - starts selecting an other record sequence. Every following key of the virtual keyboard stands for one of 12 sequences.
+		To select it, the key has to be pressed.
+Copy  - Copies the current record sequence into an other record sequence. 
+		The target sequence has to be selected with a key (same as *Sel*).		
+Trans - switches the transpose mode on and off: the note from the keyboard is not recorded in the sequence
+        and is used instead to transpose the play sequence.
 
 ## Steuerung über Keyboard
 
