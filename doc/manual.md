@@ -1,17 +1,17 @@
 
-	= KeySeq
+	# KeySeq
 	
 	KeySeq ist ein Sequenzer, der über (MIDI->CV) Keyboard Sequenzen erfassen kann 
 	und aber auch über Keyboard gesteuert werden kann.
 	
-	== Features
+	## Features
 	
 	
 	- 12 Sequenzen mit maximal 256 Steps.
 	- Erfassen von Noten, verbundenen Noten und Pausen
 	- Transpose Funktion
 	
-	== Grundprinzip
+	## Grundprinzip
 	
 
 	Folgende Sequenzen sind in KEY-SEQ vorhanden:
@@ -38,7 +38,7 @@
 	
 	statt.
 	
-	== Verwendung
+	## Verwendung
 	
 	
 	Die Eingänge Run, Clk, Rst sind mit einem Clock Modul zu verbinden, das den Takt
@@ -71,7 +71,7 @@
 	Trans - schaltet den Transpose Modus ein und aus: die Note vom Keyboard wird nicht in der Sequenz erfasst 
 	        und dient stattdessen zum Transponieren der Play-Sequenz.
 	
-	== Steuerung über Keyboard
+	## Steuerung über Keyboard
 	
 	
 	Die Befehle des virtuellen Keyboards können auch mit dem (MIDI->CV) Keyboard ausgelöst werden.
@@ -86,7 +86,7 @@
 	um die Befehle auszulösen. In diesem Fall ist keine zweite Taste zu drücken. Über das erste Keyboard kann dann die Sequenz
 	eingegeben werden. Das zweite dient zum Auslösen der Befehle.
 	
-	== Bedeutung der Lichter
+	## Bedeutung der Lichter
 	
 	
 	Play - Ein Kopieren der Sequenz in die Play-Sequenz wurde angefordert. Das kopieren findet aber erst statt,
@@ -99,15 +99,13 @@
 	Trans - zeigt an, das der Transpose-Modus angeschaltet ist.
 	
 
-	== Auswahl der Sequenz über CV
-	
-	
+	## Auswahl der Sequenz über CV
+		
 	Die zu Play-Sequenz kann auch über den Eingang Play gesteuert werden. 
 	Sobald hier eine andere Spannung anliegt, wird die zum Notenwert passen Record-Sequenz in die 
 	Play-Sequenz kopiert.
 
-	== Transponieren der Play-Sequenz
-	
+	## Transponieren der Play-Sequenz
 	
 	Hierzu gibt es drei Möglichkeiten, die verschiedene Prioritäten haben. Welche Möglichkeit gerade
 	verwendet wird läßt sich an der Farbe erkennen, in der die Basisnote zum Transponieren im Trans-Diplay 
@@ -131,7 +129,7 @@
 	Ist die Trans-Sequenz leer, dann wird C4 als Basisnote zum Transponieren verwendet und im Display weiß dargestellt.
 	
 	
-	== Anzeige
+	## Anzeige
 	
 	
 	Gelbe Anzeigen beziehen sich auf die Record-Sequenz und grüne auf die Play Sequenz.
@@ -147,11 +145,11 @@
 	
 	Notenwerte werden durch einen Buchstaben für den Notenwert und eine Zahl für die Oktave dargestellt. 
 	Pausen werden durch das Zeichen " ' " dargestellt und verbundene Noten 
-	(die den selben Notenwert haben, wie der Vorgänger) werden durch "~~~" dargestellt.
+	(die den selben Notenwert haben, wie der Vorgänger) werden durch "\~\~\~" dargestellt.
 	Das Ende der Sequenz wird mit einem " | " markiert.
 	
 	
-	== Optionen
+	## Optionen
 	
 	... werden über das Menü eingestellt.
 	
