@@ -1,5 +1,7 @@
 # KEY-SEQ
 
+![](KEY-SEQ.jpg)
+
 ## Features
 
 - 12 sequences with a maximum of 256 steps.
