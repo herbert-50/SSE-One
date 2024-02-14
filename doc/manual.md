@@ -145,22 +145,24 @@ the play sequence.
 ## Transposing The Play Sequence
 
 There are three ways to change the transposing of the play sequence, each with a different priority.
-Which is currently used, can be determined on the color of the base note, which is displayed on the module.
+Which is currently used, can be determined on the color of the base note, which is displayed on the module (4).
+
+![](KEY-SEQ-Trans.jpg)
 
 The highest priority has the transpose mode, which can be switched on and off
-using the **Trans** function.
+using the **Trans** command (1).
 If it is switched on, it determines the base note for transposing from the note entered on the (first) MIDI keyboard.
 The note is shown in yellow in the Trans display after a key was pressed
 and then in blue as soon as it is activated at the end of the play sequence.
 
-The Trans input has the second highest priority. When a voltage changes, the resulting note
+The Trans input has the second highest priority (2). When a voltage changes, the resulting note
 (according to 1V/Oct) is set as the base note for transposing. The note will appear
 in yellow in the Trans display after the voltage changed and it
 will appear in green when it is activated.
 
 if neither the transpose mode is on nor the Trans input is used, then the base note
 for transposing is determined from the transpose sequence.
-This sequence can be filled by copying the record sequence 11 with the **Play** command.
+This sequence can be filled by copying the record sequence 11 (3) with the **Play** command.
 The current base note is shown in purple in the Trans display.
 
 If the trans sequence is empty, then C4 is used as the base note
@@ -172,6 +174,7 @@ for transposing and is shown in white on the display.
 Yellow displays are used for the current record sequence and green displays are used for the
 play sequence.
 
+![](KEY-SEQ-Display.jpg)
 
 The big displays on left and right side show the current step of the sequence.
 The small displays on the side show number of steps. The displays in the center show the
