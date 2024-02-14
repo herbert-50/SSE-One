@@ -65,8 +65,6 @@ the connected MIDI keyboard.
 
 The following commands are available:
 
-![](KEY-SEQ-VirtKey.jpg)
-
 - **Play** : copies the current *record sequence* into the *play sequence*.
 - **Prev** : moves the input position of the current *record sequence* one step forward.
 - **Next** : moves the input position of the current *record sequence* one step backward.
@@ -90,13 +88,16 @@ You can connect two MIDI keyboards (or similar devices) via a MIDI->CV module to
 The first keyboard has to be connected to the the upper inputs (CV, Gate, Vel)
 and for the second optional keyboard the lower inputs can be used.
 
-**Pressing and releasing** a key on the first MIDI keyboard mean adding a step to the
+**Pressing and releasing** a key on the first MIDI keyboard means adding a step to the
 current *record sequence*.
 
 A command can be triggered by **pressing and holding a key and pressing an other key**
 without releasing the first key.
 
 The virtual keyboard shows which key means which command. For example C4 means **Play**.
+
+![](KEY-SEQ-VirtKey.jpg)
+
 Expect for the commands **Prev** and **Next** the octave does not matter. For these
 commands the octave determines the number of steps:
 
@@ -115,8 +116,9 @@ Pressing a key shows the white light on the virtual keyboard.
 So you can see, which command will executed if you press a second key or
 which step will be entered if you release the key.
 
-After executing the **Sel** or **Copy** command, all lights are yellow. This means that you can select
-the target sequence by a key or a button press.
+After executing the **Sel** or **Copy** command, all lights are yellow. 
+
+This means that you can select the target sequence by a key or a button press.
 
 Other lights on the virtual keyboard have the following meaning:
 
