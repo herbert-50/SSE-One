@@ -1,7 +1,7 @@
 # SSE-One
 A plugin for VCV Rack 2
 
-It contains just one module - a sequence - at the moment.
+It contains just one module - a sequencer - at the moment.
 
 More modules will follow, if I need them.
 
