@@ -8,168 +8,205 @@
 
 ## Basic principle
 
-The following sequences are present in KEY-Record sequences
+The following sequences are present in KEY-SEQ sequences
 
 - 12 Record sequences
--  1 Play sequences
--  1 Transpose sequences
+-  1 Play sequence
+-  1 Transpose sequence
 
-The *record sequences* are recorded from the keyboard. Pressung a key will add or alter a step of the sequence.
-The current *record sequence* can be copied into the *play sequence* using the **Play** function.
-This sequence will then be played.
+The *record sequences* are recorded from the keyboard.
+One of the 12 *record sequences* is the **current** *record sequence*.
+Pressing a key on the MIDI keyboard will add or alter a step of this sequence.
+The current *record sequence* can be copied into the *play sequence*
+using the **Play** command. The steps of this sequence will then be played on the
+outputs of the module.
 
-Using the **Sel** function, another of the 12 *record sequences* can be selected, changed with the keyboard and then
-can be copied into the *play sequence* with **Play**. The last sequence (number 11) is special
-meaning too. It is not copied into the *play sequence*, but into the *trans sequence*. The *trans sequence* determines
-the base note of the *play sequence* to transpose. After each pass through the *play sequence* the next note
-of *trans sequence* will be used.
+With the **Sel** command another of the 12 *record sequences* can be selected
+and becomes to the current *record sequence*.
+
+The last *record sequence* (number 11) is special.
+It is not copied into the *play sequence*, but into the *trans sequence* using
+the **Play** command.
+The *trans sequence* determines the base note of the *play sequence* to transpose.
+After each pass through the *play sequence* the next note of *trans sequence* will be used
+as base note.
 
 
-The following options are available for controlling the sequences:
+The the commands can be triggered in different ways:
 
-- the module's virtual keyboard
-- or the connected (MIDI->CV) keyboard
-- or a second connected (MIDI->CV) keyboard
+- with the buttons on the virtual keyboard of the module
+- with key combinations of the connected MIDI keyboard
+- with keys of a second connected MIDI keyboard
 
 ## Usage
 
-The *Run*, *Clk*, *Rst* inputs must be connected to a clock module that supplies the clock
+The *Run*, *Clk*, *Rst* inputs have to be connected to a clock module that supplies the clock
 and via which the sequencer can be started and reset. Starting and resetting
-can also be started and reset using the corresponding switches on the module. 
-The Run and Rst inputs are therefore optional.
+can also be done using the corresponding switches on the module.
+The *Run* and *Rst* inputs are therefore optional.
 
-The sequence is output at the *CV*, *Gate* and *Vel* outputs. The *Gate* control can be used to
-the set the length of the gate signal .
+The values of the play sequence are present at the *CV*, *Gate* and *Vel* outputs.
+The *Gate* control can be used to the set the length of the gate signal .
 
-The *CV*, *Gate* and *Vel* inputs must be connected to a *MIDI->CV* module or to a module
-which provides similar signals. 
+The *CV*, *Gate* and *Vel* inputs have to be connected to a *MIDI->CV* module
+or to a module which provides similar signals.
 
-Both input and output *Vel* are optional.
+Both *Vel* signals are optional.
 
-Now a sequence can be entered using the connected keyboard.
-
-
-The functions are started via the module’s virtual keyboard. The following commands are available:
-
-- **Play** : copies the current record sequence to the play sequence.
-- **Prev** : moves the input position of the current record sequence on step forward.
-- **Next** : moves the input position of the current record sequence on step backward.
-- **Rest** : adds a rest to the current record sequence.
-- **Tie**  : adds a tied note to the current record sequence.
-- **Del**  : deletes a note from the current record sequence.
-- **Clear** : deletes all notes from the current record sequence.
-- **Ins**   : switches the insert mode on and off: notes will be inserted or overwritten.
-- **Sel**   : starts selecting an other record sequence. Every following key of the virtual keyboard stands for one of 12 sequences.
-		To select it, the key has to be pressed.
-- **Copy**  : Copies the current record sequence into an other record sequence. 
-		The target sequence has to be selected with a key (same as *Sel*).		
-- **Trans** : switches the transpose mode on and off: the note from the keyboard is not recorded in the sequence
-		and is used instead to transpose the play sequence.
-
-## Steuerung über Keyboard
+Now a sequence can be entered into the current *record sequence* using
+the connected MIDI keyboard.
 
 
-Die Befehle des virtuellen Keyboards können auch mit dem (MIDI->CV) Keyboard ausgelöst werden.
-Dazu ist die enstprechende Taste zu drücken und ohne diese loszulassen eine zweite Taste. 
-Also beispielsweise die Taste C4 drücken und festhalten. Dann D4 drücken und beide Tasten loslassen, 
-um den Befehl Play auszulösen. Die zweite Taste kann eine beliebige sein. Die Oktave spielt nur bei den
-Befehlen Prev und Next eine Rolle und ist ansonsten egal. Prev oder Next in einer Octave < 4 bewegt 
-die Eingabeposition um einen Schritt. Prev oder Next in einer Octave > 4 bewegt 
-die Eingabeposition um einen 11 Schritte (=eine Zeile) und in Oktave 4 sind es 5 Schritte.
+The following commands are available:
 
-Alternativ kann auch ein zweites Keyboard (zB Launchpad) an die unteren CV Gate Eingänge angeschlossen werden,
-um die Befehle auszulösen. In diesem Fall ist keine zweite Taste zu drücken. Über das erste Keyboard kann dann die Sequenz
-eingegeben werden. Das zweite dient zum Auslösen der Befehle.
+- **Play** : copies the current *record sequence* into the *play sequence*.
+- **Prev** : moves the input position of the current *record sequence* one step forward.
+- **Next** : moves the input position of the current *record sequence* one step backward.
+- **Rest** : adds a rest to the current *record sequence*.
+- **Tie**  : adds a tied note to the current *record sequence*.
+- **Del**  : deletes a note from the current *record sequence*.
+- **Clear** : deletes all notes from the current *record sequence*.
+- **Ins**   : switches the **insert mode** on and off: notes will be inserted or overwritten.
+- **Sel**   : starts selecting an other record sequence.
+            Every following key (or button) stands for one of 12 sequences.
+            To select it, the key (or button) has to be pressed.
+- **Copy**  : Copies the current *record sequence* into an other *record sequence*.
+        The target sequence has to be selected with a key (same as *Sel*).       
+- **Trans** : switches the **transpose mode** on and off:
+        the note from the keyboard is not recorded in the sequence
+        and is used instead to transpose the *play sequence*.
 
-## Bedeutung der Lichter
+## Commands With The MIDI Keyboards
 
+You can connect two MIDI keyboards (or similar devices) via a MIDI->CV module to KEY-SEQ.
+The first keyboard has to be connected to the the upper inputs (CV, Gate, Vel)
+and for the second optional keyboard the lower inputs can be used.
 
-Play - Ein Kopieren der Sequenz in die Play-Sequenz wurde angefordert. Das kopieren findet aber erst statt,
-	   wenn die aktuelle Sequenz zu ende gespielt wurde. So lange leuchtet die Play-Leuchte.
-	   
-Clear - leuchtet so lange, wie eine Sequenz leer ist.
+**Pressing and releasing** a key on the first MIDI keyboard mean adding a step to the
+current *record sequence*.
 
-Ins - zeigt an, das der Insert-Modus angeschaltet ist.
+A command can be triggered by **pressing and holding a key and pressing an other key**
+without releasing the first key.
 
-Trans - zeigt an, das der Transpose-Modus angeschaltet ist.
+The virtual keyboard shows which key means which command. For example C4 means **Play**.
+Expect for the commands **Prev** and **Next** the octave does not matter. For these
+commands the octave determines the number of steps:
 
+- octave < 4 : 1 step
+- octave > 4 : 11 steps (one row)
+- octave = 4 : 5 steps
 
-## Auswahl der Sequenz über CV
-	
-Die zu Play-Sequenz kann auch über den Eingang Play gesteuert werden. 
-Sobald hier eine andere Spannung anliegt, wird die zum Notenwert passen Record-Sequenz in die 
-Play-Sequenz kopiert.
+The second MIDI keyboard will be used only for commands. On this keyboard a command will
+be executed by pressing a key. No key combination is needed.
 
-## Transponieren der Play-Sequenz
+So you can use one keyboard for the steps and the other keyboard for the commands.
 
-Hierzu gibt es drei Möglichkeiten, die verschiedene Prioritäten haben. Welche Möglichkeit gerade
-verwendet wird läßt sich an der Farbe erkennen, in der die Basisnote zum Transponieren im Trans-Diplay 
-dargestellt wird.
+## Meaning Of The Lights
 
-Die höchste Priorität hat der Transpose-Modus, der über die Funktion Trans ein und ausgeschaltet wird.
-Ist er eingeschaltet, dann bestimmt er anhand der über das Keyboard eingegeben Note die Basisnote zum Transponieren.
-Die Note wird im Trans-Display nach dem Tastendruck in gelb und dann in blau angezeigt, sobald sie aktiviert wird.
-Die anderen Möglichkeiten werden nur berücksichtigt, wenn der Transpose-Modus ausgeschaltet ist.
+Pressing a key shows the white light on the virtual keyboard.
+So you can see, which command will executed if you press a second key or
+which step will be entered if you release the key.
 
-Die zweit höchste Priorität hat der Eingang Trans. Bei der Änderung einer Spannung wird die daraus resultierende Note
-(gemäß 1V/Oct) als Basisnote zum Transponieren eingestellt. Die Note wird im Trans-Display nach der Spannungsänderung
-in gelb und dann in grün angezeigt, sobald sie aktiviert wird.
+After executing the **Sel** or **Copy** command, all lights are yellow. This means that you can select
+the target sequence by a key or a button press.
 
-Ist weder der Transpose-Modus an, noch der Eingang Trans belegt, dann wird die Basisnote zum Transponieren über die 
-Transpose-Sequenz bestimmt. Sie kann befüllt werden, indem die Record-Sequenz 11 mit der Play Funktion kopiert 
-wird (Autoplay funktioniert hier nicht).
-Damit kommt der Record-Sequenz 11 eine besondere Bedeutung zu. Sie wird im Display deshalb in lila dargestellt.
-Auf im Trans-Display wird die aktuelle Basisnote in lila dargestellt.
-
-Ist die Trans-Sequenz leer, dann wird C4 als Basisnote zum Transponieren verwendet und im Display weiß dargestellt.
-
-
-## Anzeige
+Other lights on the virtual keyboard have the following meaning:
 
 
-Gelbe Anzeigen beziehen sich auf die Record-Sequenz und grüne auf die Play Sequenz.
+- **Play** - Yellow means: waiting for copy.
+    in this case the **Play** command was executed, but the sequence will be not directly. When it was copied (after the current sequence has ended) the yellow light is switched of.
+      
+- **Clear** - Green means: the current record sequence is empty. With the first entered note the light will be switched off.
 
-Die großen Anzeigen links und rechts zeigen den aktuellen Schritt an. 
-Die kleinen Anzeigen daneben zeigen die Gesamtanzahl Schritte der Sequenz an. Die dritte Anzeige zeigt die Nummer
-der Sequenz (0-11) an.
+- **Ins** - Green means: the insert mode is on.
 
-In der großen dreizeiligen Anzeige darunter wird die aktuelle Record Sequenz (oder ein Teil davon je nach Länge)
-ausgegeben. Die aktuelle Position befindet sich immer in der Mitte. 
-Das bedeutet bei den Befehlen Next und Prev wird nicht die Position in der Anzeige verschoben, sondern die angezeigten Noten.
-Somit sind immer 16 Steps vor und 16 Steps hinter der aktuellen Position sichtbar.
-
-Notenwerte werden durch einen Buchstaben für den Notenwert und eine Zahl für die Oktave dargestellt. 
-Pausen werden durch das Zeichen " ' " dargestellt und verbundene Noten 
-(die den selben Notenwert haben, wie der Vorgänger) werden durch "\~\~\~" dargestellt.
-Das Ende der Sequenz wird mit einem " | " markiert.
+- **Trans** - Blue means: the transpose mode is on.
 
 
-## Optionen
+## Copy And Play A Sequence With A CV Signal
+    
+To copy and play a sequence the input *Play* can be used instead of  a command. 
 
-... werden über das Menü eingestellt.
+The voltage on this input has to confirm the 1V/oct standard or has to be 1..10V (see Options).
+If the voltage changes then the corresponding record sequence will be copied into
+the play sequence.
 
-Cmd from keyboard : legt fest, ob eine (Zweitasten) Steuerung über das erste Keyboard möglich ist.
-					Bei Verwendung eines zweiten Keyboard oder des virtuellen Keyboard kann diese Option ausgeschaltet werden.
-					
-Cmd from last key : wenn gesetzt, dann bestimmt nicht die zuerst gedrückte Taste den Befehl, sondern die die
-					als zweites gedrückt wurde. C4 D4 würde dann statt Play Rest auslösen.
-					
-Autoplay when
-... new note      : löst den Befehl Play aus, wenn eine (neue) Note in der Record-Sequenz eingegeben wurde.
-... new rest      : löst den Befehl Play aus, wenn eine Pause in der Record-Sequenz eingegeben wurde.
-... new tie       : löst den Befehl Play aus, wenn eine verbundene Note in der Record-Sequenz eingegeben wurde.
-... delete        : löst den Befehl Play aus, wenn ein Step in der Record-Sequenz gelöscht wurde.
-... select sequence : löst den Befehl Play aus, wenn eine andere Record-Sequenz gewählt wurde.
+## Transposing The Play Sequence
 
-Play CV 0..10V    : Setzt den Bereich für den Eingang Play zur Auswahl der Sequenz auf 0-10V statt auf C-B.
+There are three ways to change the transposing of the play sequence, each with a different priority.
+Which is currently used, can be determined on the color of the base note, which is displayed on the module.
 
-Play after end of Sequenz: Das Kopieren einer Record-Sequenz in die Play-Sequenz erfolgt erst am 
-						   Ende der aktuellen Sequenz. Wenn die Option nicht gesetzt ist, erfolgt das Kopieren
-						   mit der Clock.
+The highest priority has the transpose mode, which can be switched on and off
+using the **Trans** function.
+If it is switched on, it determines the base note for transposing from the note entered on the (first) MIDI keyboard.
+The note is shown in yellow in the Trans display after a key was pressed
+and then in blue as soon as it is activated at the end of the play sequence.
 
-Transpose after end of Sequenz: Die Basisnote zum Transponieren wird erfasst und wirkt sich aber erst am 
-						   Ende der aktuellen Sequenz aus. Wenn die Option nicht gesetzt ist, wird die Basisnote
-						   mit der Clock gesetzt.
+The Trans input has the second highest priority. When a voltage changes, the resulting note
+(according to 1V/Oct) is set as the base note for transposing. The note will appear
+in yellow in the Trans display after the voltage changed and it
+will appear in green when it is activated.
 
-Set Seqence after copy: Nach dem Kopieren wird die Ziel Sequenz aktiviert.
+if neither the transpose mode is on nor the Trans input is used, then the base note
+for transposing is determined from the transpose sequence.
+This sequence can be filled by copying the record sequence 11 with the **Play** command.
+The current base note is shown in purple in the Trans display.
+
+If the trans sequence is empty, then C4 is used as the base note
+for transposing and is shown in white on the display.
+
+
+## Displays
+
+Yellow displays are used for the current record sequence and green displays are used for the
+play sequence.
+
+
+The big displays on left and right side show the current step of the sequence.
+The small displays on the side show number of steps. The displays in the center show the
+number of the sequence (0-11). In case of the record sequence this is
+the number of the current sequence. In case of the play sequence this is the number
+of the last record sequence that was copied.
+
+The large three line display below shows the current record sequence
+(or part of it, depending on the length)
+The current position is always in the center. This means that the **Next** and **Prev**
+commands do not move the position in the display, but the displayed notes instead.
+So 16 steps before and 16 steps after the current position are always visible.
+
+Note values are represented by a letter for the note value and a number for the octave.
+Rests are represented by the sign " ' " and tied notes
+(which have the same note value as their predecessor) are represented by "\~\~\~".
+The end of the sequence is marked with a " | ".
+
+## Options In the Menu
+
+
+- *Cmd from keyboard* : determines whether control is possible
+  via the first MIDI keyboard (key combination). This option can be
+  switched off when using a second keyboard or the buttons on
+  the virtual keyboard.
+                   
+- *Cmd from last key* : if set, then the command is not determined by the first key pressed,
+    but by the second key pressed.
+
+                   
+- *Autoplay when*
+
+    - *new note*      : triggers the Play command when a (new) note is entered in the record sequence.
+    - *new rest*      : triggers the Play command when a rest is entered in the record sequence.
+    - *new tie*       : triggers the Play command when a tied note is entered in the record sequence.
+    - *delete*        : triggers the Play command when a note is deleted from the record sequence.
+    - *select sequence* : triggers the Play command when a other record sequence is selected.
+
+- *Play CV 0..10V*    : Sets the range for the Play input for selecting the sequence to 0-10V instead of note C-B.
+
+- *Play after end of Sequence*: A record sequence is copied to the play sequence at the end of the sequence.
+                        If the option is not set, copying takes place with the clock.
+
+- *Transpose after end of Sequence*: The base note for transposition only takes effect at the end of the
+                           end of the play sequence. If the option is **not** set, the base note
+                           for transponation is set with the clock.
+
+- *Set Sequence after copy*: If set then a record sequence will become the current record sequence after the **Copy** command.
 
