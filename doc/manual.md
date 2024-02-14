@@ -117,8 +117,9 @@ So you can see, which command will executed if you press a second key or
 which step will be entered if you release the key.
 
 After executing the **Sel** or **Copy** command, all lights are yellow. 
-
 This means that you can select the target sequence by a key or a button press.
+
+![](KEY-SEQ-Sel.jpg)
 
 Other lights on the virtual keyboard have the following meaning:
 
