@@ -42,8 +42,9 @@ The the commands can be triggered in different ways:
 
 ## Usage
 
-![](KEY-SEQ-BasePatch.jpg)
 A base patch
+
+![](KEY-SEQ-BasePatch.jpg)
 
 The *Run*, *Clk*, *Rst* inputs have to be connected to a clock module that supplies the clock
 and via which the sequencer can be started and reset. Starting and resetting
