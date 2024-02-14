@@ -65,6 +65,8 @@ the connected MIDI keyboard.
 
 The following commands are available:
 
+![](KEY-SEQ-VirtKey.jpg)
+
 - **Play** : copies the current *record sequence* into the *play sequence*.
 - **Prev** : moves the input position of the current *record sequence* one step forward.
 - **Next** : moves the input position of the current *record sequence* one step backward.
