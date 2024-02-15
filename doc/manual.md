@@ -100,7 +100,7 @@ The virtual keyboard shows which key means which command. For example C4 means *
 
 ![](KEY-SEQ-VirtKey.jpg)
 
-Expect for the commands **Prev** and **Next** the octave does not matter. For these
+Apart from the commands **Prev** and **Next**, the octave has no meaning. For these
 commands the octave determines the number of steps:
 
 - octave < 4 : 1 step
