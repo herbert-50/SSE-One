@@ -2,6 +2,17 @@
 
 ![](KEY-SEQ.jpg)
 
+KEY-SEQ stands for Keyboard-Sequences. Sequences can be entered with a MIDI keyboard and the same keyboard can also be used to control the sequences.
+This means you can start 
+
+- playing a sequence
+- transposing a sequence
+- switching to an other sequence
+
+with the MIDI keyboard.
+
+This makes KEY-SEQ perfect for live performances and improvisations.
+
 ## Features
 
 - 12 sequences with a maximum of 256 steps.
