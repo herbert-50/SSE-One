@@ -16,7 +16,7 @@
     {
       "slug": "KeySeq",
       "name": "Keyboard-Sequencer",
-      "description": "Create and control sequences with a (midi) keyboard",
+      "description": "Create and control sequences with a MIDI keyboard",
       "tags": ["Sequencer", "Keyboard"]
     }
   ]
