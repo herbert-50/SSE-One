@@ -127,7 +127,8 @@ Other lights on the virtual keyboard have the following meaning:
 
 
 - **Play** - Yellow means: waiting for copy.
-    in this case the **Play** command was executed, but the sequence will be not directly. When it was copied (after the current sequence has ended) the yellow light is switched of.
+    In this case the **Play** command was executed, but the but the module waits for the end of the current sequence.
+    When the new sequence was copied the yellow light disapears.
       
 - **Clear** - Green means: the current record sequence is empty. With the first entered note the light will be switched off.
 
@@ -138,7 +139,7 @@ Other lights on the virtual keyboard have the following meaning:
 
 ## Copy And Play A Sequence With A CV Signal
     
-To copy and play a sequence the input *Play* can be used instead of  a command. 
+To copy and play a sequence the input *Play* can be used instead of a command. 
 
 The voltage on this input has to confirm the 1V/oct standard or has to be 1..10V (see Options).
 If the voltage changes then the corresponding record sequence will be copied into
@@ -157,12 +158,12 @@ If it is switched on, it determines the base note for transposing from the note 
 The note is shown in yellow in the Trans display after a key was pressed
 and then in blue as soon as it is activated at the end of the play sequence.
 
-The Trans input has the second highest priority (2). When a voltage changes, the resulting note
+The *Trans* input has the second highest priority (2). When the voltage on this input changes, the resulting note
 (according to 1V/Oct) is set as the base note for transposing. The note will appear
 in yellow in the Trans display after the voltage changed and it
 will appear in green when it is activated.
 
-if neither the transpose mode is on nor the Trans input is used, then the base note
+If neither the transpose mode is on nor the *Trans* input is used, then the base note
 for transposing is determined from the transpose sequence.
 This sequence can be filled by copying the record sequence 11 (3) with the **Play** command.
 The current base note is shown in purple in the Trans display.
@@ -180,7 +181,7 @@ play sequence.
 
 The big displays on left and right side show the current step of the sequence.
 The small displays on the side show number of steps. The displays in the center show the
-number of the sequence (0-11). In case of the record sequence this is
+number of the sequence (s00-s11). In case of the record sequence this is
 the number of the current sequence. In case of the play sequence this is the number
 of the last record sequence that was copied.
 
@@ -195,13 +196,13 @@ Rests are represented by the sign " ' " and tied notes
 (which have the same note value as their predecessor) are represented by "\~\~\~".
 The end of the sequence is marked with a " | ".
 
-## Options In the Menu
+## Options In The Menu
 
 
 - *Cmd from keyboard* : determines whether control is possible
   via the first MIDI keyboard (key combination). This option can be
   switched off when using a second keyboard or the buttons on
-  the virtual keyboard.
+  the virtual keyboard for the commands.
                    
 - *Cmd from last key* : if set, then the command is not determined by the first key pressed,
     but by the second key pressed.
@@ -215,7 +216,7 @@ The end of the sequence is marked with a " | ".
     - *delete*        : triggers the Play command when a note is deleted from the record sequence.
     - *select sequence* : triggers the Play command when a other record sequence is selected.
 
-- *Play CV 0..10V*    : Sets the range for the Play input for selecting the sequence to 0-10V instead of note C-B.
+- *Play CV 0..10V*    : Sets the range for the Play input for selecting the sequence to 0-10V instead of note range C-B.
 
 - *Play after end of Sequence*: A record sequence is copied to the play sequence at the end of the sequence.
                         If the option is not set, copying takes place with the clock.
