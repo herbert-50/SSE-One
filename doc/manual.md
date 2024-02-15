@@ -34,11 +34,6 @@ After each pass through the *play sequence* the next note of *trans sequence* wi
 as base note.
 
 
-The the commands can be triggered in different ways:
-
-- with the buttons on the virtual keyboard of the module
-- with key combinations of the connected MIDI keyboard
-- with keys of a second connected MIDI keyboard
 
 ## Usage
 
@@ -60,8 +55,15 @@ or to a module which provides similar signals.
 Both *Vel* signals are optional.
 
 Now a sequence can be entered into the current *record sequence* using
-the connected MIDI keyboard.
+the connected MIDI keyboard and the MIDI keyboard can be used to control the modul.
 
+## Controlling With Commands
+
+The the commands can be triggered in different ways:
+
+- with the buttons on the virtual keyboard of the module
+- with key combinations of the connected MIDI keyboard
+- with keys of a second connected MIDI keyboard
 
 The following commands are available:
 
