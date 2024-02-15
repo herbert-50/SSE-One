@@ -2,7 +2,7 @@
 
 ![](KEY-SEQ.jpg)
 
-KEY-SEQ stands for Keyboard-Sequences. Sequences can be entered with a MIDI keyboard and the same keyboard can also be used to control the sequences.
+KEY-SEQ stands for Keyboard-Sequencer. Sequences can be entered with a MIDI keyboard and the same keyboard can also be used to control the sequences.
 This means you can start 
 
 - playing a sequence
