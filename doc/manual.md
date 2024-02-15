@@ -13,6 +13,8 @@ with the MIDI keyboard.
 
 This makes KEY-SEQ perfect for live performances and improvisations.
 
+Here you can find a Demo Video: https://www.youtube.com/watch?v=0zP2XU9faUw
+
 ## Features
 
 - 12 sequences with a maximum of 256 steps.
