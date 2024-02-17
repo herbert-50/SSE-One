@@ -67,6 +67,8 @@ or to a module which provides similar signals.
 
 Both *Vel* signals are optional.
 
+Make sure the record button is on (red light). This is the default setting.
+
 Now a sequence can be entered into the current *record sequence* using
 the connected MIDI keyboard and the MIDI keyboard can be used to control the modul.
 
@@ -208,6 +210,11 @@ Note values are represented by a letter for the note value and a number for the 
 Rests are represented by the sign " ' " and tied notes
 (which have the same note value as their predecessor) are represented by "\~\~\~".
 The end of the sequence is marked with a " | ".
+
+## Playing Keyboard ( and not the sequence)
+
+... is also possible. Just switch off the *Record* button.
+
 
 ## Options In The Menu
 
