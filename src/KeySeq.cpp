@@ -150,9 +150,9 @@ struct Sequence {
 	bool insertStep(float CV, int gatemode, float velocity) {
 		// make a gap
 		if (len < MAX_STEPS) {
-			if (pos < len) {
+			/*if (pos < len) {
 				pos++;
-			}
+			}*/
 			for (int i=len; i > pos; i--) {
 				step[i].CV = step[i-1].CV;
 				step[i].gatemode = step[i-1].gatemode;
@@ -359,6 +359,7 @@ struct KeySeq : Module {
 	enum ParamId { TIECLICK_PARAM, GATELEN_PARAM, RUN_PARAM,
 		RST_PARAM, NEXT_PARAM, PREV_PARAM, SQTRA_PARAM, COPY_PARAM, RES_PARAM, CLEAR_PARAM,
 		PLAY_PARAM, TIE_PARAM, DEL_PARAM, INS_PARAM, REST_PARAM, SEL_PARAM, TRANS_PARAM, 
+		RECORD_PARAM,
 		PARAMS_LEN
 	};
 	enum InputId { CV_INPUT, RUN_INPUT, GATE_INPUT, CLK_INPUT, VEL_INPUT, RST_INPUT,
@@ -372,7 +373,7 @@ struct KeySeq : Module {
 		ENUMS(CLEAR_LIGHT, 3), ENUMS(SQTRA_LIGHT, 3), ENUMS(COPY_LIGHT, 3),
 		ENUMS(PLAY_LIGHT, 3), ENUMS(REST_LIGHT, 3), ENUMS(TIE_LIGHT, 3), ENUMS(DEL_LIGHT, 3), 
 		ENUMS(INS_LIGHT, 3), ENUMS(TRANS_LIGHT, 3), ENUMS(SEL_LIGHT, 3),
-		KEYPRESS_LIGHT,
+		KEYPRESS_LIGHT, RECORD_LIGHT,
 		LIGHTS_LEN
 	};
 	enum LightColor { OFF, YELLOW, GREEN, RED, BLUE, WHITE, ON };
@@ -390,6 +391,7 @@ struct KeySeq : Module {
 	int gatelenEOS;
 	bool bWaitForSel;
 	bool bWaitForCopy;
+	bool bTransMode;
 	
 	std::atomic_flag thread_flag;
 	dsp::ClockDivider lightDivider;
@@ -495,6 +497,7 @@ struct KeySeq : Module {
 		lastFrame = 0;
 		bWaitForSel = false;
 		bWaitForCopy = false;
+		bTransMode = false;
 		
 		// create empty sequences		
 		for (int i = 0; i < NUM_SEQ; i++) {
@@ -541,6 +544,8 @@ struct KeySeq : Module {
 		bSetSeqOnCopy = true;
 		bKeyboardControl = true;
 		bPlayUse10 = false;
+
+		params[RECORD_PARAM].setValue(1.f);
 		
 		seqNoteDiplayColor = SCHEME_YELLOW;
 		updateDisplayNotes();
@@ -752,20 +757,13 @@ struct KeySeq : Module {
 			params[COPY_PARAM].setValue(1.0f);
 			break;
 		case 11:
-			if (params[TRANS_PARAM].getValue() == 1.f) {
-				params[TRANS_PARAM].setValue(0.f);
-				setLightColor(TRANS_LIGHT, OFF);
-			}
-			else {
-				params[TRANS_PARAM].setValue(1.f);
-				setLightColor(TRANS_LIGHT, GREEN);
-			}
+			params[TRANS_PARAM].setValue(1.f);
 			break;
 		}
 	}
 
 	void setTransVoltage() {
-		if (params[TRANS_PARAM].getValue() > 0) {
+		if (bTransMode) {
 			if (compareCV(transCVVoltage, newTransCVVoltage) != 0) {
 				// update TransCVvoltage on end of seq, if a new value is set
 				transCVVoltage = newTransCVVoltage;
@@ -846,77 +844,89 @@ struct KeySeq : Module {
 		if (this->thread_flag.test_and_set())
 			return;
 
-		//
-		// handle CLK_INPUT; play notes
-		bool bClock = clock.process(inputs[CLK_INPUT].getVoltage());
-		if (bClock && params[RUN_PARAM].getValue() > 0.f) {
+		if (params[RECORD_PARAM].getValue() > 0) {
+			//
+			// handle CLK_INPUT; play notes
+			bool bClock = clock.process(inputs[CLK_INPUT].getVoltage());
+			if (bClock && params[RUN_PARAM].getValue() > 0.f) {
 
-			if (pSeqPLAY->isAfterLastStep()) {
-				gatelenEOS = 200;
-				if (bCopyOnEOS && seqRECToPLAYIdx >= 0) {
-					copyRecSequenceToPlay();
-				}
-			
-				if (bTransOnEOS) {
-					setTransVoltage();
-				}
-				
-				// End of Seq - start at begin
-				pSeqPLAY->reset();
-			}
-			
-			if (!pSeqPLAY->isAfterLastStep()) {
-				// seq contains a new step
-
-				if (!bCopyOnEOS && seqRECToPLAYIdx >= 0) {
-					copyRecSequenceToPlay();
-				}
-
-				if (!bTransOnEOS) {
-					setTransVoltage();
-				}
-				
-				// set CV, gatelen and velocity
-				float cvVoltage = pSeqPLAY->getCV() + transCVVoltage;
-				int gatemode = pSeqPLAY->getGatemode();
-				int gatemode_next = pSeqPLAY->getGatemode(1);
-				float velVoltage = pSeqPLAY->getVelocity();
-				if (gatemode == GATEMODE_NORMAL || gatemode == GATEMODE_TIED) {
-					outputs[CV_OUTPUT].setVoltage(cvVoltage);
-					outputs[VEL_OUTPUT].setVoltage(velVoltage);
-					if (gatemode_next == GATEMODE_TIED) {
-						gatelen = 5000; // means until next step (or longer)
+				if (pSeqPLAY->isAfterLastStep()) {
+					gatelenEOS = 200;
+					if (bCopyOnEOS && seqRECToPLAYIdx >= 0) {
+						copyRecSequenceToPlay();
 					}
-					else {
-						gatelen = params[GATELEN_PARAM].getValue();
-					}
-				}
-				else if (gatemode == GATEMODE_REST) {
-					outputs[CV_OUTPUT].setVoltage(0.f);
-					outputs[VEL_OUTPUT].setVoltage(0.f);
-					gatelen = 0; // no gate on a rest
-				}
 				
-				char keyNameDbg[8];
-				fillNoteFromVoltage(keyNameDbg, cvVoltage);
-				DEBUG("%d play CV=%f Vel=%f Gate=%d Gatemode=%d Note=%s", 
-					pSeqPLAY->pos, cvVoltage, velVoltage, gatelen, gatemode, keyNameDbg);
+					if (bTransOnEOS) {
+						setTransVoltage();
+					}
 					
-				pSeqPLAY->next();
+					// End of Seq - start at begin
+					pSeqPLAY->reset();
+				}
+				
+				if (!pSeqPLAY->isAfterLastStep()) {
+					// seq contains a new step
+
+					if (!bCopyOnEOS && seqRECToPLAYIdx >= 0) {
+						copyRecSequenceToPlay();
+					}
+
+					if (!bTransOnEOS) {
+						setTransVoltage();
+					}
+					
+					// set CV, gatelen and velocity
+					float cvVoltage = pSeqPLAY->getCV() + transCVVoltage;
+					int gatemode = pSeqPLAY->getGatemode();
+					int gatemode_next = pSeqPLAY->getGatemode(1);
+					float velVoltage = pSeqPLAY->getVelocity();
+					if (gatemode == GATEMODE_NORMAL || gatemode == GATEMODE_TIED) {
+						outputs[CV_OUTPUT].setVoltage(cvVoltage);
+						outputs[VEL_OUTPUT].setVoltage(velVoltage);
+						if (gatemode_next == GATEMODE_TIED) {
+							gatelen = 5000; // means until next step (or longer)
+						}
+						else {
+							gatelen = params[GATELEN_PARAM].getValue();
+						}
+					}
+					else if (gatemode == GATEMODE_REST) {
+						outputs[CV_OUTPUT].setVoltage(0.f);
+						outputs[VEL_OUTPUT].setVoltage(0.f);
+						gatelen = 0; // no gate on a rest
+					}
+					
+					char keyNameDbg[8];
+					fillNoteFromVoltage(keyNameDbg, cvVoltage);
+					DEBUG("%d play CV=%f Vel=%f Gate=%d Gatemode=%d Note=%s", 
+						pSeqPLAY->pos, cvVoltage, velVoltage, gatelen, gatemode, keyNameDbg);
+						
+					pSeqPLAY->next();
+				}
+				else {
+					// seq is empty (contains only GATEMODE_EOS)
+				}
+			}
+			//
+			// set GATE_OUTPUT; play notes
+			if (gatelen > 0) {
+				outputs[GATE_OUTPUT].setVoltage(10.f);
+				gatelen--;
 			}
 			else {
-				// seq is empty (contains only GATEMODE_EOS)
+				outputs[GATE_OUTPUT].setVoltage(0.f);
 			}
 		}
-		
-		//
-		// set GATE_OUTPUT; play notes
-		if (gatelen > 0) {
-			outputs[GATE_OUTPUT].setVoltage(10.f);
-			gatelen--;
-		}
 		else {
-			outputs[GATE_OUTPUT].setVoltage(0.f);
+			// send inputs to outputs
+			outputs[CV_OUTPUT].setVoltage(inputs[CV_INPUT].getVoltage());
+			outputs[GATE_OUTPUT].setVoltage(inputs[GATE_INPUT].getVoltage());
+			if (inputs[VEL_INPUT].isConnected()) {
+				outputs[VEL_OUTPUT].setVoltage(inputs[VEL_INPUT].getVoltage());
+			}
+			else {
+				outputs[VEL_OUTPUT].setVoltage(10.f);
+			}
 		}
 		
 		// set END_OUTPUT
@@ -976,146 +986,149 @@ struct KeySeq : Module {
 
 		}
 
-		//
-		// handle GATE_INPUT; record notes and commands
-		int iGateEvent = gatein.processEvent(inputs[GATE_INPUT].getVoltage());
-		if (iGateEvent == dsp::TSchmittTrigger<float>::Event::TRIGGERED) {
-			// Key pressed
-			gateStartCvVoltage = inputs[CV_INPUT].getVoltage();
-			DEBUG("Key pressed CV=%f", gateStartCvVoltage);
-			int idx = getIdxByNoteVoltage(gateStartCvVoltage - floor(gateStartCvVoltage));
-			setLightColor(keyLights[idx], WHITE);
-			bRecordNote = true;
-			if (bKeyboardControl) {
-				bWaitForCmd = true;
-			}
-			setLightColor(KEYPRESS_LIGHT, ON);
-		}
-		else if (gatein.isHigh()) { 
-			// Key IS pressed
-			float cvVoltage = inputs[CV_INPUT].getVoltage();
-			if (bWaitForCmd && compareCV(gateStartCvVoltage, cvVoltage) != 0) {
-				// waiting for command (bWaitForCmd)
-				// and a second key was pressed (CV Voltage has changed)
-				// -> set _PARAM voltage to execute command
-				
-				if (bCmdFromLastKey) {
-					// set cmd from first key
-					setCmdByCvVoltage(cvVoltage);
-				}
-				else {
-					// set cmd from last key
-					setCmdByCvVoltage(gateStartCvVoltage);
-				}
-				bWaitForCmd = false;
-				bRecordNote = false; // after a command no note should be recorded
-			}
-			else if (!bWaitForCmd && compareCV(gateStartCvVoltage, cvVoltage) == 0) {
-				// Command was set/executed in last process-loop (!bWaitForCmd)
-				// and second key was released // (CV voltage is the same as at first keypress)
-				// -> wait for next command
+		if (params[RECORD_PARAM].getValue() > 0) {
+
+			//
+			// handle GATE_INPUT; record notes and commands
+			int iGateEvent = gatein.processEvent(inputs[GATE_INPUT].getVoltage());
+			if (iGateEvent == dsp::TSchmittTrigger<float>::Event::TRIGGERED) {
+				// Key pressed
+				gateStartCvVoltage = inputs[CV_INPUT].getVoltage();
+				DEBUG("Key pressed CV=%f", gateStartCvVoltage);
+				int idx = getIdxByNoteVoltage(gateStartCvVoltage - floor(gateStartCvVoltage));
+				setLightColor(keyLights[idx], WHITE);
+				bRecordNote = true;
 				if (bKeyboardControl) {
 					bWaitForCmd = true;
 				}
-				if (cmdLight != -1) {
-					setLightColor(cmdLight, OFF);
-					cmdLight = -1;
+				setLightColor(KEYPRESS_LIGHT, ON);
+			}
+			else if (gatein.isHigh()) { 
+				// Key IS pressed
+				float cvVoltage = inputs[CV_INPUT].getVoltage();
+				if (bWaitForCmd && compareCV(gateStartCvVoltage, cvVoltage) != 0) {
+					// waiting for command (bWaitForCmd)
+					// and a second key was pressed (CV Voltage has changed)
+					// -> set _PARAM voltage to execute command
+					
+					if (bCmdFromLastKey) {
+						// set cmd from first key
+						setCmdByCvVoltage(cvVoltage);
+					}
+					else {
+						// set cmd from last key
+						setCmdByCvVoltage(gateStartCvVoltage);
+					}
+					bWaitForCmd = false;
+					bRecordNote = false; // after a command no note should be recorded
 				}
-				if (! (bWaitForSel || bWaitForCopy)) {
-					int idx = getIdxByNoteVoltage(gateStartCvVoltage - floor(gateStartCvVoltage));
-					setLightColor(keyLights[idx], WHITE);
+				else if (!bWaitForCmd && compareCV(gateStartCvVoltage, cvVoltage) == 0) {
+					// Command was set/executed in last process-loop (!bWaitForCmd)
+					// and second key was released // (CV voltage is the same as at first keypress)
+					// -> wait for next command
+					if (bKeyboardControl) {
+						bWaitForCmd = true;
+					}
+					if (cmdLight != -1) {
+						setLightColor(cmdLight, OFF);
+						cmdLight = -1;
+					}
+					if (! (bWaitForSel || bWaitForCopy)) {
+						int idx = getIdxByNoteVoltage(gateStartCvVoltage - floor(gateStartCvVoltage));
+						setLightColor(keyLights[idx], WHITE);
+					}
 				}
 			}
-		}
 
-		//
-		// record note on key release
-		if (iGateEvent == dsp::TSchmittTrigger<float>::Event::UNTRIGGERED) {
-			setLightColor(KEYPRESS_LIGHT, OFF);
+			//
+			// record note on key release
+			if (iGateEvent == dsp::TSchmittTrigger<float>::Event::UNTRIGGERED) {
+				setLightColor(KEYPRESS_LIGHT, OFF);
 
-			if (bRecordNote) {
-				// Key was pressed an no command was executed (bRecordNote)
-				float cvVoltage = inputs[CV_INPUT].getVoltage();
-				float velVoltage = 10.0f;
-				if (inputs[VEL_INPUT].isConnected()) {
-					velVoltage = inputs[VEL_INPUT].getVoltage();
-				}
-				DEBUG("Key released CV=%f", cvVoltage);
-				int idx = getIdxByNoteVoltage(gateStartCvVoltage - floor(gateStartCvVoltage));
-				setLightColor(keyLights[idx], OFF);
-				
-				if (params[TRANS_PARAM].getValue() == 1.f) {
-					DEBUG("Transpose by note");
-					// use note for translation
-					newTransCVVoltage = cvVoltage;
-					fillNoteFromVoltage(transKey, newTransCVVoltage);
-					transKeyColor = SCHEME_YELLOW;
-				}
-				else if ((bWaitForSel || bWaitForCopy) && bKeyboardControl) {
-					// use note for seq index
-					float noteVoltage = cvVoltage - floor(cvVoltage); 
-					int idx = getIdxByNoteVoltage(noteVoltage);
-					if (bWaitForSel) { 
-						selectSequence(idx);
+				if (bRecordNote) {
+					// Key was pressed an no command was executed (bRecordNote)
+					float cvVoltage = inputs[CV_INPUT].getVoltage();
+					float velVoltage = 10.0f;
+					if (inputs[VEL_INPUT].isConnected()) {
+						velVoltage = inputs[VEL_INPUT].getVoltage();
 					}
-					else if (bWaitForCopy) {
-						copyRecSequenceToOther(idx);
+					DEBUG("Key released CV=%f", cvVoltage);
+					int idx = getIdxByNoteVoltage(gateStartCvVoltage - floor(gateStartCvVoltage));
+					setLightColor(keyLights[idx], OFF);
+					
+					if ((bWaitForSel || bWaitForCopy) && bKeyboardControl) {
+						// use note for seq index
+						float noteVoltage = cvVoltage - floor(cvVoltage); 
+						int idx = getIdxByNoteVoltage(noteVoltage);
+						if (bWaitForSel) { 
+							selectSequence(idx);
+						}
+						else if (bWaitForCopy) {
+							copyRecSequenceToOther(idx);
+						}
 					}
-				}
-				else {
-					DEBUG("Record Note");
-#ifdef SMART_TIE					
-					int64_t diffFrames = args.frame - lastFrame;
-					int diffTime = 	(int)(diffFrames*APP->engine->getSampleTime()*1000);
-					float lastCVVoltage = pSeqREC->getCV(-1);
-					int lastGatemode = pSeqREC->getGatemode(-1);
-					float lastVelocity = pSeqREC->getVelocity(-1);
-					DEBUG("difftime=%d ms", diffTime);
-					if (diffTime > params[TIECLICK_PARAM].getValue() && diffTime < 5000 && !bFirstStep && 
-						compareCV(lastCVVoltage, cvVoltage) == 0 &&
-						lastGatemode != GATEMODE_REST
-						) {
-						// 	Slow press of same key -> add a tied note
-						DEBUG("%d record TIED 2", pSeqREC->pos);
-						if (params[INS_PARAM].getValue() == 1.f) {
-							pSeqREC->insertStep(lastCVVoltage, GATEMODE_TIED, lastVelocity);
+					else if (bTransMode) {
+						DEBUG("Transpose by note");
+						// use note for translation
+						newTransCVVoltage = cvVoltage;
+						fillNoteFromVoltage(transKey, newTransCVVoltage);
+						transKeyColor = SCHEME_YELLOW;
+					}
+					else {
+						DEBUG("Record Note");
+	#ifdef SMART_TIE					
+						int64_t diffFrames = args.frame - lastFrame;
+						int diffTime = 	(int)(diffFrames*APP->engine->getSampleTime()*1000);
+						float lastCVVoltage = pSeqREC->getCV(-1);
+						int lastGatemode = pSeqREC->getGatemode(-1);
+						float lastVelocity = pSeqREC->getVelocity(-1);
+						DEBUG("difftime=%d ms", diffTime);
+						if (diffTime > params[TIECLICK_PARAM].getValue() && diffTime < 5000 && !bFirstStep && 
+							compareCV(lastCVVoltage, cvVoltage) == 0 &&
+							lastGatemode != GATEMODE_REST
+							) {
+							// 	Slow press of same key -> add a tied note
+							DEBUG("%d record TIED 2", pSeqREC->pos);
+							if (params[INS_PARAM].getValue() == 1.f) {
+								pSeqREC->insertStep(lastCVVoltage, GATEMODE_TIED, lastVelocity);
+							}
+							else {
+								pSeqREC->setStep(lastCVVoltage, GATEMODE_TIED, lastVelocity);
+							}
+							if ((bAutoPlayOnNewNote || bAutoPlayAlways) && seqRECIdx != 11) {
+								seqRECToPLAYIdx = seqRECIdx;
+							}
 						}
 						else {
-							pSeqREC->setStep(lastCVVoltage, GATEMODE_TIED, lastVelocity);
+	#endif						
+						DEBUG("%d record CV=%f Time=%ld", pSeqREC->pos, cvVoltage, args.frame - lastFrame);
+						if (params[INS_PARAM].getValue() == 1.f) {
+							pSeqREC->insertStep(cvVoltage, GATEMODE_NORMAL, velVoltage);
+						}
+						else {
+							pSeqREC->setStep(cvVoltage, GATEMODE_NORMAL, velVoltage);
 						}
 						if ((bAutoPlayOnNewNote || bAutoPlayAlways) && seqRECIdx != 11) {
 							seqRECToPLAYIdx = seqRECIdx;
 						}
+	#ifdef SMART_TIE					
+						}
+	#endif
+						if (pSeqREC->next()) {
+							displayNeedsUpdate = true;
+						}
+						lastFrame = args.frame;
 					}
-					else {
-#endif						
-					DEBUG("%d record CV=%f Time=%ld", pSeqREC->pos, cvVoltage, args.frame - lastFrame);
-					if (params[INS_PARAM].getValue() == 1.f) {
-						pSeqREC->insertStep(cvVoltage, GATEMODE_NORMAL, velVoltage);
-					}
-					else {
-						pSeqREC->setStep(cvVoltage, GATEMODE_NORMAL, velVoltage);
-					}
-					if ((bAutoPlayOnNewNote || bAutoPlayAlways) && seqRECIdx != 11) {
-						seqRECToPLAYIdx = seqRECIdx;
-					}
-#ifdef SMART_TIE					
-					}
-#endif
-					if (pSeqREC->next()) {
-						displayNeedsUpdate = true;
-					}
-					lastFrame = args.frame;
+					bRecordNote = false;
 				}
-				bRecordNote = false;
-			}
-			else {
-				if (! (bWaitForSel || bWaitForCopy)) {
-					float cvVoltage = inputs[CV_INPUT].getVoltage();
-					int idx = getIdxByNoteVoltage(cvVoltage - floor(cvVoltage));
-					setLightColor(keyLights[idx], OFF);
+				else {
+					if (! (bWaitForSel || bWaitForCopy)) {
+						float cvVoltage = inputs[CV_INPUT].getVoltage();
+						int idx = getIdxByNoteVoltage(cvVoltage - floor(cvVoltage));
+						setLightColor(keyLights[idx], OFF);
+					}
+					bWaitForCmd = false;
 				}
-				bWaitForCmd = false;
 			}
 		}
 		
@@ -1259,15 +1272,21 @@ struct KeySeq : Module {
 				setWaitForFollowingKey(COPY_PARAM, true);
 				params[COPY_PARAM].setValue(0.f);
 			}
+			
+			if (params[TRANS_PARAM].getValue() > 0.f) {
+				bTransMode = ! bTransMode;
+				params[TRANS_PARAM].setValue(0.f);
+			}
 
 		}
 		
 		if (lightDivider.process() && ! (bWaitForSel || bWaitForCopy || bRecordNote)) {
 			setLightColor(RUN_LIGHT, params[RUN_PARAM].getValue() > 0 ? ON : OFF);
 			setLightColor(CLEAR_LIGHT, pSeqREC->len == 0 ? GREEN : OFF);
-			setLightColor(TRANS_LIGHT, params[TRANS_PARAM].getValue() > 0 ? BLUE : OFF);
+			setLightColor(TRANS_LIGHT, bTransMode ? BLUE : OFF);
 			setLightColor(INS_LIGHT, params[INS_PARAM].getValue() > 0 ? GREEN : OFF);
 			setLightColor(PLAY_LIGHT, seqRECToPLAYIdx >= 0 ? YELLOW : OFF);
+			setLightColor(RECORD_LIGHT, params[RECORD_PARAM].getValue() > 0 ? ON : OFF);
 		}
 		
 		if (displayNeedsUpdate) {
@@ -1630,6 +1649,7 @@ struct KeySeqWidget : ModuleWidget {
 		addParam(createLightParamCentered<VCVLightLatch<MediumSimpleLight<RedGreenBlueLight>>>(mm2px(Vec(75.184, 111.083)), module, KeySeq::INS_PARAM, KeySeq::INS_LIGHT));
 		addParam(createLightParamCentered<VCVLightLatch<MediumSimpleLight<RedGreenBlueLight>>>(mm2px(Vec(88.731, 111.083)), module, KeySeq::SEL_PARAM, KeySeq::SEL_LIGHT));
 		addParam(createLightParamCentered<VCVLightLatch<MediumSimpleLight<RedGreenBlueLight>>>(mm2px(Vec(102.277, 111.083)), module, KeySeq::TRANS_PARAM, KeySeq::TRANS_LIGHT));
+		addParam(createLightParamCentered<VCVLightLatch<MediumSimpleLight<RedLight>>>(mm2px(Vec(32.512, 27.093)), module, KeySeq::RECORD_PARAM, KeySeq::RECORD_LIGHT));
 
 		addChild(createLightCentered<LargeLight<YellowLight>>(mm2px(Vec(114.043, 107.058)), module, KeySeq::KEYPRESS_LIGHT));
 
