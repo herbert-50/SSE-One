@@ -1,7 +1,7 @@
 #include "plugin.hpp"
 
 // Uncomment to activate debug messages
-// #define DEBUG(format, ...) 
+#define DEBUG(format, ...) 
 
 #define MAX_STEPS 256
 #define NUM_SEQ 12
@@ -451,7 +451,8 @@ struct KeySeq : Module {
 	bool bCopyOnEOS;
 	bool bTransOnEOS;
 	bool bSetSeqOnCopy;
-	
+	bool bSelectOnPlayInput;
+
 	KeySeq() {
 		config(PARAMS_LEN, INPUTS_LEN, OUTPUTS_LEN, LIGHTS_LEN);
 #ifdef SMART_TIE
@@ -494,6 +495,7 @@ struct KeySeq : Module {
 	
 	void doReset() {
 		gatelen = 0;
+		gatelenEOS = 0;
 		lastFrame = 0;
 		bWaitForSel = false;
 		bWaitForCopy = false;
@@ -544,6 +546,7 @@ struct KeySeq : Module {
 		bSetSeqOnCopy = true;
 		bKeyboardControl = true;
 		bPlayUse10 = false;
+		bSelectOnPlayInput = false;
 
 		params[RECORD_PARAM].setValue(1.f);
 		
@@ -948,12 +951,16 @@ struct KeySeq : Module {
 			DEBUG("Reset");
 			pSeqPLAY->reset();
 			params[RST_PARAM].setValue(0.f);
+			gatelen = 0;
+			gatelenEOS = 0;
 		}
 
 		bool bRun = run.process(inputs[RUN_INPUT].getVoltage());
 		if (bRun) {
 			if (params[RUN_PARAM].getValue() > 0.f) {
 				params[RUN_PARAM].setValue(0.f);
+				gatelen = 0;
+				gatelenEOS = 0;
 				DEBUG("Stop run");
 			}
 			else {
@@ -967,14 +974,19 @@ struct KeySeq : Module {
 			lastCopyVoltage = copyInputVoltage;
 			int newSeqPLAYIdx = -1;
 			if (bPlayUse10) {
-				newSeqPLAYIdx = int ((copyInputVoltage/10.0f) * NUM_SEQ);
+				newSeqPLAYIdx = round((copyInputVoltage/10.0f) * NUM_SEQ);
 			}
 			else {
 				float noteVoltage = copyInputVoltage - floor(copyInputVoltage); 
 				newSeqPLAYIdx = getIdxByNoteVoltage(noteVoltage);
 			}
 			if (newSeqPLAYIdx != seqPLAYIdx && newSeqPLAYIdx >= 0 && newSeqPLAYIdx <= NUM_SEQ) {
-				seqRECToPLAYIdx = newSeqPLAYIdx;
+				if (bSelectOnPlayInput) {
+					selectSequence(newSeqPLAYIdx);
+				}
+				else {
+					seqRECToPLAYIdx = newSeqPLAYIdx;
+				}
 			}
 		}
 
@@ -1358,6 +1370,7 @@ struct KeySeq : Module {
 		json_object_set_new(j_root, "TransOnEOS", json_boolean(bTransOnEOS));
 		json_object_set_new(j_root, "SetSeqOnCopy", json_boolean(bSetSeqOnCopy));
 		json_object_set_new(j_root, "KeyboardControl", json_boolean(bKeyboardControl));
+		json_object_set_new(j_root, "SelectOnPlayInput", json_boolean(bSelectOnPlayInput));
 
 		return j_root;
 	}
@@ -1413,6 +1426,7 @@ struct KeySeq : Module {
 		bTransOnEOS = json_boolean_value(json_object_get(j_root, "TransOnEOS"));
 		bSetSeqOnCopy = json_boolean_value(json_object_get(j_root, "SetSeqOnCopy"));
 		bKeyboardControl = json_boolean_value(json_object_get(j_root, "KeyboardControl"));
+		bSelectOnPlayInput = json_boolean_value(json_object_get(j_root, "SelectOnPlayInput"));
 
 		displayNeedsUpdate = true;
 	}
@@ -1722,7 +1736,8 @@ struct KeySeqWidget : ModuleWidget {
 				menu->addChild(createBoolPtrMenuItem("When select sequence", "", &module->bAutoPlayOnSeqSelected));
 			}
 		));
-		menu->addChild(createBoolPtrMenuItem("Copy CV 0..10V", "", &module->bPlayUse10));
+		menu->addChild(createBoolPtrMenuItem("Play Input CV 0..10V", "", &module->bPlayUse10));
+		menu->addChild(createBoolPtrMenuItem("Play Input selects sequence", "", &module->bSelectOnPlayInput));
 		menu->addChild(createBoolPtrMenuItem("Copy after end of sequence", "", &module->bCopyOnEOS));
 		menu->addChild(createBoolPtrMenuItem("Transpose after end of sequence", "", &module->bTransOnEOS));
 		menu->addChild(createBoolPtrMenuItem("Set sequence after copy", "", &module->bSetSeqOnCopy));
