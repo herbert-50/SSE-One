@@ -226,7 +226,6 @@ The end of the sequence is marked with a " | ".
                    
 - *Cmd from last key* : if set, then the command is not determined by the first key pressed,
     but by the second key pressed.
-
                    
 - *Autoplay when*
 
@@ -237,6 +236,8 @@ The end of the sequence is marked with a " | ".
     - *select sequence* : triggers the Play command when a other record sequence is selected.
 
 - *Play CV 0..10V*    : Sets the range for the Play input for selecting the sequence to 0-10V instead of note range C-B.
+
+- *Play input selects sequence*: Instead of copying a recording sequence into the playback sequence, a recording sequence is             selected. If "autoplay when select sequence" is set, then the sequence will also be copied into the play sequence.
 
 - *Play after end of Sequence*: A record sequence is copied to the play sequence at the end of the sequence.
                         If the option is not set, copying takes place with the clock.
