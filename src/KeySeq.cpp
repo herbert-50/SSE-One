@@ -1,7 +1,7 @@
 #include "plugin.hpp"
 
-// Uncomment to activate debug messages
-#define DEBUG(format, ...) 
+// Comment out to activate debug messages
+#define DEBUG(format, ...)
 
 #define MAX_STEPS 256
 #define NUM_SEQ 12
@@ -452,7 +452,7 @@ struct KeySeq : Module {
 	bool bTransOnEOS;
 	bool bSetSeqOnCopy;
 	bool bSelectOnPlayInput;
-
+	
 	KeySeq() {
 		config(PARAMS_LEN, INPUTS_LEN, OUTPUTS_LEN, LIGHTS_LEN);
 #ifdef SMART_TIE
@@ -670,18 +670,19 @@ struct KeySeq : Module {
 	
 	int getIdxByNoteVoltage(float noteVoltage) {
 		int idx = 0;
-		if (compareCV(noteVoltage, 0.000000f) == 0) idx = 0;
-		if (compareCV(noteVoltage, 0.083333f) == 0) idx = 1;
-		if (compareCV(noteVoltage, 0.166667f) == 0) idx = 2;
-		if (compareCV(noteVoltage, 0.250000f) == 0) idx = 3;
-		if (compareCV(noteVoltage, 0.333333f) == 0) idx = 4;
-		if (compareCV(noteVoltage, 0.416667f) == 0) idx = 5;
-		if (compareCV(noteVoltage, 0.500000f) == 0) idx = 6;
-		if (compareCV(noteVoltage, 0.583333f) == 0) idx = 7;
-		if (compareCV(noteVoltage, 0.666667f) == 0) idx = 8;
-		if (compareCV(noteVoltage, 0.750000f) == 0) idx = 9;
-		if (compareCV(noteVoltage, 0.833333f) == 0) idx = 10;
-		if (compareCV(noteVoltage, 0.916667f) == 0) idx = 11;
+		if (noteVoltage >= 0.000000f - 0.005f) idx = 0;
+		if (noteVoltage >= 0.083333f - 0.005f) idx = 1;
+		if (noteVoltage >= 0.166667f - 0.005f) idx = 2;
+		if (noteVoltage >= 0.250000f - 0.005f) idx = 3;
+		if (noteVoltage >= 0.333333f - 0.005f) idx = 4;
+		if (noteVoltage >= 0.416667f - 0.005f) idx = 5;
+		if (noteVoltage >= 0.500000f - 0.005f) idx = 6;
+		if (noteVoltage >= 0.583333f - 0.005f) idx = 7;
+		if (noteVoltage >= 0.666667f - 0.005f) idx = 8;
+		if (noteVoltage >= 0.750000f - 0.005f) idx = 9;
+		if (noteVoltage >= 0.833333f - 0.005f) idx = 10;
+		if (noteVoltage >= 0.916667f - 0.005f) idx = 11;
+
 		return idx;
 	}
 
@@ -950,9 +951,9 @@ struct KeySeq : Module {
 		if (params[RST_PARAM].getValue() > 0.f) {
 			DEBUG("Reset");
 			pSeqPLAY->reset();
-			params[RST_PARAM].setValue(0.f);
 			gatelen = 0;
 			gatelenEOS = 0;
+			params[RST_PARAM].setValue(0.f);
 		}
 
 		bool bRun = run.process(inputs[RUN_INPUT].getVoltage());
@@ -978,6 +979,7 @@ struct KeySeq : Module {
 			}
 			else {
 				float noteVoltage = copyInputVoltage - floor(copyInputVoltage); 
+				newSeqPLAYIdx = 0;
 				newSeqPLAYIdx = getIdxByNoteVoltage(noteVoltage);
 			}
 			if (newSeqPLAYIdx != seqPLAYIdx && newSeqPLAYIdx >= 0 && newSeqPLAYIdx <= NUM_SEQ) {
@@ -1288,6 +1290,11 @@ struct KeySeq : Module {
 			if (params[TRANS_PARAM].getValue() > 0.f) {
 				bTransMode = ! bTransMode;
 				params[TRANS_PARAM].setValue(0.f);
+			}
+			
+			if (params[SQTRA_PARAM].getValue() > 0.f) {
+				// Reserved for future expansion
+				params[SQTRA_PARAM].setValue(0.f);
 			}
 
 		}
